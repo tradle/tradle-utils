@@ -20,5 +20,11 @@
     "create-torrent": "^3.5.1",
     "defaults": "^1.0.0",
     "parse-torrent": "^3.0.0"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-githooks": "^0.3.1",
+    "grunt-jsbeautifier": "^0.2.7"
   }
 }
