@@ -1,11 +1,15 @@
-
 'use strict';
 
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 
   require('load-grunt-tasks')(grunt);
+
+  grunt.registerTask('setup', [
+    'githooks'
+  ]);
+
   grunt.registerTask('default', [
-    'jshint'
+    'jshint:default'
   ]);
 
   // Project configuration.
@@ -23,11 +27,11 @@ module.exports = function(grunt) {
       },
 
       default: {
-        src: ['lib/**/*.js']
+        src: ['*.js']
       },
 
       verify: {
-        src: ['lib/**/*.js'],
+        src: ['*.js'],
         options: {
           mode: 'VERIFY_ONLY'
         }
@@ -44,7 +48,7 @@ module.exports = function(grunt) {
       },
 
       default: {
-        src: ['Gruntfile.js', 'lib/**/*.js']
+        src: ['Gruntfile.js', '*.js']
       }
     }
 
