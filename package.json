@@ -4,9 +4,9 @@
   "description": "common utility functions for tradle components",
   "main": "index.js",
   "scripts": {
-    "postinstall": "npm install -g js-beautify jshint && npm install --save-dev tradle-style pre-commit tape",
-    "jsbeautify": "js-beautify --config=node_modules/tradle-style/.jsbeautifyrc -r -f *.js",
-    "jshint": "jshint . -c node_modules/tradle-style/.jshintrc --exclude-path .gitignore"
+    "postinstall": "cp node_modules/tradle-style/.js* .",
+    "jsbeautify": "js-beautify -r **.js",
+    "jshint": "jshint **.js"
   },
   "pre-commit": [
     "jsbeautify",
@@ -29,6 +29,8 @@
     "parse-torrent": "^3.0.0"
   },
   "devDependencies": {
+    "jshint": "latest",
+    "js-beautify": "latest",
     "pre-commit": "0.0.11",
     "tape": "^3.4.0",
     "tradle-style": "0.0.1",
