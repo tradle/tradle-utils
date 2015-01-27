@@ -33,7 +33,7 @@
     "js-beautify": "latest",
     "pre-commit": "0.0.11",
     "tape": "^3.4.0",
-    "tradle-style": "0.0.1",
+    "tradle-style": "latest",
     "which": "^1.0.8"
   }
 }
