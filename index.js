@@ -105,7 +105,7 @@ var utils = {
   },
 
   bindPrototypeFunctions: function(obj) {
-    // bind all prototype functions to self  
+    // bind all prototype functions to self
     var proto = obj.constructor.prototype;
     for (var p in proto) {
       var val = proto[p];
