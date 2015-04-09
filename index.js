@@ -8,6 +8,7 @@ var defaults = require('defaults');
 var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');
+var stringify = require('json-stable-stringify');
 
 var utils = {
   createTorrent: function(data, options, callback) {
@@ -63,7 +64,7 @@ var utils = {
     return options[option];
   },
 
-  requireOptions: function(options /*, option1, option2... */ ) {
+  requireOptions: function(options /*[, option1, option2, ...]*/) {
     [].slice.call(arguments, 1).map(function(arg) {
       utils.requireOption(options, arg);
     });
@@ -118,6 +119,12 @@ var utils = {
     if (typeof paramValue === 'undefined') throw new Error('Missing required parameter: ' + paramName);
 
     return paramValue;
+  },
+
+  stringify: function(obj) {
+    if (typeof obj === 'string') return obj;
+
+    return stringify(obj);
   }
 }
 
