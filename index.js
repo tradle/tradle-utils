@@ -121,6 +121,12 @@ var utils = {
     return paramValue;
   },
 
+  prettify: function(obj) {
+    if (typeof obj === 'string') return obj;
+
+    return stringify(obj, { space: 2 });
+  },
+
   stringify: function(obj) {
     if (typeof obj === 'string') return obj;
 
