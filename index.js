@@ -5,9 +5,6 @@ var createTorrent = require('create-torrent');
 var parseTorrent = require('parse-torrent');
 var crypto = require('crypto');
 var defaults = require('defaults');
-var fs = require('fs');
-var path = require('path');
-var mkdirp = require('mkdirp');
 var stringify = require('json-stable-stringify');
 
 var utils = {
@@ -67,34 +64,6 @@ var utils = {
   requireOptions: function(options /*[, option1, option2, ...]*/) {
     [].slice.call(arguments, 1).map(function(arg) {
       utils.requireOption(options, arg);
-    });
-  },
-
-  writeFile: function(options, callback) {
-    var filePath = utils.requireOption(options, 'path');
-    filePath = path.resolve(filePath);
-    var data = utils.requireOption(options, 'data');
-    var fileOptions = options.options || {
-      encoding: 'utf8'
-    };
-    var tmpPath = options.safe ?
-      filePath + '.' + crypto.randomBytes(8).toString('hex') + '.tmp' :
-      filePath;
-
-    mkdirp(path.dirname(filePath), function(err) {
-      if (err) return callback(err);
-
-      fs.writeFile(tmpPath, data, fileOptions, function(err) {
-        if (err) return callback(err);
-
-        if (!options.safe) return callback();
-
-        fs.rename(tmpPath, filePath, function(err) {
-          if (err) return callback(err);
-
-          callback();
-        })
-      });
     });
   },
 
