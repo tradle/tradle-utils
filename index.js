@@ -42,6 +42,12 @@ var utils = {
     });
   },
 
+  getStorageKeyFor: function(data, callback) {
+    utils.getInfoHash(data, function(err, infoHash) {
+      callback(err, new Buffer(infoHash, 'hex'));
+    })
+  },
+
   getTorrentName: function(val) {
     return crypto.createHash('sha256').update(val).digest('hex');
   },
@@ -158,6 +164,21 @@ var utils = {
         return out.script.chunks[1]
       }
     }
+  },
+
+  sharedSecret: function(aPriv, bPub) {
+    aPriv = aPriv.d || aPriv;
+    var shared = bPub.Q.multiply(aPriv).getEncoded(true)
+    // cut off version byte 0x02/0x03
+    // https://github.com/cryptocoinjs/ecurve/blob/master/lib/point.js#L207
+    if (shared.length === 66) shared = shared.slice(2);
+
+    return shared;
+  },
+
+  sharedEncryptionKey: function(aPriv, bPub) {
+    var sharedSecret = utils.sharedSecret(aPriv, bPub);
+    return crypto.createHash('sha256').update(sharedSecret).digest();
   }
 }
 
