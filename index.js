@@ -55,18 +55,6 @@ var utils = {
     return val !== '0' && val !== 'false';
   },
 
-  requireOption: function(options, option) {
-    if (!(option in options)) throw new Error('Missing required option: ' + option);
-
-    return options[option];
-  },
-
-  requireOptions: function(options /*[, option1, option2, ...]*/) {
-    [].slice.call(arguments, 1).map(function(arg) {
-      utils.requireOption(options, arg);
-    });
-  },
-
   proxyFunctions: function(proxy, source) {
     for (var p in source) {
       if (!proxy[p] && typeof source[p] === 'function')
@@ -82,12 +70,6 @@ var utils = {
       if (typeof val === 'function')
         obj[p] = obj[p].bind(obj);
     }
-  },
-
-  requireParam: function(paramName, paramValue) {
-    if (typeof paramValue === 'undefined') throw new Error('Missing required parameter: ' + paramName);
-
-    return paramValue;
   },
 
   prettify: function(obj) {
