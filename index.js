@@ -1,15 +1,16 @@
 'use strict';
 
 var assert = require('assert');
-var createTorrent = require('create-torrent');
-var parseTorrent = require('parse-torrent');
-var crypto = require('crypto');
-var defaults = require('defaults');
 var fs = require('fs');
 var path = require('path');
+var crypto = require('crypto');
+var createTorrent = require('create-torrent');
+var parseTorrent = require('parse-torrent');
+var defaults = require('defaults');
 var mkdirp = require('mkdirp');
 var stringify = require('json-stable-stringify');
 var bitcoin = require('bitcoinjs-lib')
+var CTR = 'aes-256-ctr';
 
 var utils = {
   createTorrent: function(data, options, callback) {
@@ -179,7 +180,31 @@ var utils = {
   sharedEncryptionKey: function(aPriv, bPub) {
     var sharedSecret = utils.sharedSecret(aPriv, bPub);
     return crypto.createHash('sha256').update(sharedSecret).digest();
+  },
+
+  encrypt: function(text, password) {
+    assert(text && password, 'text and password are both required');
+
+    var cipher = crypto.createCipher(CTR, password);
+    return updateCipher(cipher, text);
+  },
+
+  decrypt: function(text, password) {
+    assert(text && password, 'text and password are both required');
+
+    var decipher = crypto.createDecipher(CTR, password);
+    return updateDecipher(decipher, text);
   }
+}
+
+function updateCipher(cipher, data) {
+  if (Buffer.isBuffer(data)) return Buffer.concat([cipher.update(data), cipher.final()]);
+  else return cipher.update(data, 'utf8', 'base64') + cipher.final('base64');
+}
+
+function updateDecipher(decipher, data) {
+  if (Buffer.isBuffer(data)) return Buffer.concat([decipher.update(data), decipher.final()]);
+  else return decipher.update(data, 'base64', 'utf8') + decipher.final('utf8');
 }
 
 module.exports = utils;
