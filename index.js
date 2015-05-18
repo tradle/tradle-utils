@@ -9,6 +9,7 @@ var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');
 var stringify = require('json-stable-stringify');
+var bitcoin = require('bitcoinjs-lib')
 
 var utils = {
   createTorrent: function(data, options, callback) {
@@ -131,6 +132,32 @@ var utils = {
     if (typeof obj === 'string') return obj;
 
     return stringify(obj);
+  },
+
+  getAddressFromInput: function(input, networkName) {
+    if (bitcoin.scripts.classifyInput(input.script) === 'pubkeyhash') {
+      var network = bitcoin.networks[networkName];
+      return bitcoin.ECPubKey.fromBuffer(input.script.chunks[1])
+        .getAddress(network)
+        .toString();
+    }
+  },
+
+  getAddressFromOutput: function(output, networkName) {
+    if (bitcoin.scripts.classifyOutput(output.script) === 'pubkeyhash') {
+      return bitcoin.Address
+        .fromOutputScript(output.script, bitcoin.networks[networkName])
+        .toString();
+    }
+  },
+
+  getOpReturnData: function(tx) {
+    for (var i = 0, l = tx.outs.length; i < l; i++) {
+      var out = tx.outs[i]
+      if (bitcoin.scripts.isNullDataOutput(out.script)) {
+        return out.script.chunks[1]
+      }
+    }
   }
 }
 
