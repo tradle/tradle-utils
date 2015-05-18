@@ -4,9 +4,9 @@
   "description": "common utility functions for tradle components",
   "main": "index.js",
   "scripts": {
-    "jsbeautify": "js-beautify -r *.js --config node_modules/tradle-style/.jsbeautifyrc",
     "jshint": "jshint *.js --config node_modules/tradle-style/.jshintrc",
-    "jscs": "jscs *.js  --config node_modules/tradle-style/.jscsrc"
+    "jscs": "jscs *.js  --config node_modules/tradle-style/.jscsrc",
+    "test": "node test/*.js"
   },
   "pre-commit": [
     "jscs",
@@ -33,10 +33,11 @@
     "bitcoinjs-lib": "*"
   },
   "devDependencies": {
+    "bitcoinjs-lib": "*",
+    "buffer-equal": "0.0.1",
     "jshint": "latest",
-    "js-beautify": "latest",
     "pre-commit": "0.0.11",
-    "tape": "^3.4.0",
+    "tape": "^4.0.0",
     "tradle-style": "latest",
     "which": "^1.0.8"
   }
