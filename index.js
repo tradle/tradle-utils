@@ -159,6 +159,9 @@ var utils = {
   },
 
   getOpReturnData: function(tx) {
+    if (typeof tx === 'string') tx = bitcoin.Transaction.fromHex(tx)
+    else if (Buffer.isBuffer(tx)) tx = bitcoin.Transaction.fromBuffer(tx)
+
     for (var i = 0, l = tx.outs.length; i < l; i++) {
       var out = tx.outs[i]
       if (bitcoin.scripts.isNullDataOutput(out.script)) {
