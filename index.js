@@ -175,7 +175,7 @@ var utils = {
     var shared = bPub.Q.multiply(aPriv).getEncoded(true)
     // cut off version byte 0x02/0x03
     // https://github.com/cryptocoinjs/ecurve/blob/master/lib/point.js#L207
-    if (shared.length === 66) shared = shared.slice(2);
+    if (shared.length === 33) shared = shared.slice(1);
 
     return shared;
   },
