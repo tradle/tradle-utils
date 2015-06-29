@@ -171,6 +171,9 @@ var utils = {
   },
 
   sharedSecret: function(aPriv, bPub) {
+    if (typeof aPriv === 'string') aPriv = bitcoin.ECKey.fromWIF(aPriv)
+    if (typeof bPub === 'string') bPub = bitcoin.ECPubKey.fromHex(bPub)
+
     aPriv = aPriv.d || aPriv;
     var shared = bPub.Q.multiply(aPriv).getEncoded(true)
     // cut off version byte 0x02/0x03
