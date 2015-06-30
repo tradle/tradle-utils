@@ -4,13 +4,12 @@
   "description": "common utility functions for tradle components",
   "main": "index.js",
   "scripts": {
-    "jshint": "jshint *.js --config node_modules/tradle-style/.jshintrc",
-    "jscs": "jscs *.js  --config node_modules/tradle-style/.jscsrc",
-    "test": "node test/*.js"
+    "test": "node test/*.js",
+    "style": "standard"
   },
   "pre-commit": [
-    "jscs",
-    "jshint"
+    "style",
+    "test"
   ],
   "bugs": {
     "url": "https://github.com/tradle/tradle-utils/issues"
@@ -33,9 +32,7 @@
   "devDependencies": {
     "buffer-equal": "0.0.1",
     "jshint": "latest",
-    "pre-commit": "0.0.11",
-    "tape": "^4.0.0",
-    "tradle-style": "latest",
-    "which": "^1.0.8"
+    "pre-commit": "^1.0.10",
+    "tape": "^4.0.0"
   }
 }
