@@ -11,6 +11,7 @@ var mkdirp = require('mkdirp')
 var stringify = require('json-stable-stringify')
 var bitcoin = require('bitcoinjs-lib')
 var CTR = 'aes-256-ctr'
+var DHT_MSG_REGEX = /^d1:(.?d2:id20:|eli20)/
 
 var utils = {
   createTorrent: function (data, options, callback) {
@@ -202,6 +203,10 @@ var utils = {
 
     var decipher = crypto.createDecipher(CTR, password)
     return updateDecipher(decipher, text)
+  },
+
+  isDHTMessage: function (msg) {
+    return DHT_MSG_REGEX.test(msg)
   }
 }
 
