@@ -73,7 +73,7 @@ var utils = {
     return options[option]
   },
 
-  requireOptions: function (options /*[, option1, option2, ...]*/) {
+  requireOptions: function (options /* [, option1, option2, ...] */) {
     [].slice.call(arguments, 1).map(function (arg) {
       utils.requireOption(options, arg)
     })
