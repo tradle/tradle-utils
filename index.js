@@ -207,6 +207,12 @@ var utils = {
 
   isDHTMessage: function (msg) {
     return DHT_MSG_REGEX.test(msg)
+  },
+
+  newMsgNonce: function (cb) {
+    crypto.randomBytes(32, function (err, bytes) {
+      cb(err, bytes && bytes.toString('base64'))
+    })
   }
 }
 
