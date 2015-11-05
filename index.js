@@ -150,7 +150,7 @@ var utils = {
     var pub
     try {
       pub = bitcoin.ECPubKey.fromBuffer(input.script.chunks[1])
-      return pub.getAddress(networkName).toString()
+      return pub.getAddress(bitcoin.networks[networkName]).toString()
     } catch (err) {
     }
   },
