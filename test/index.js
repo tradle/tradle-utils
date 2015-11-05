@@ -20,18 +20,25 @@ test('aes encrypt/decrypt', function (t) {
 })
 
 test('ecdh', function (t) {
-  t.plan(1)
-
   var a = ECKey.makeRandom()
   var b = ECKey.makeRandom()
 
   // var ab = a.pub.Q.multiply(b.d).getEncoded()
   // var ba = b.pub.Q.multiply(a.d).getEncoded()
 
-  var ab = utils.sharedEncryptionKey(a.d, b.pub)
-  var ba = utils.sharedEncryptionKey(b.d, a.pub)
+  // pass in strings
+  var ab = utils.sharedEncryptionKey(a.d, b.pub.toHex())
+  var ba = utils.sharedEncryptionKey(b.d, a.pub.toHex())
+  var fromWIF = utils.sharedEncryptionKey(a.toWIF(), b.pub.toHex())
+  var fromECKey = utils.sharedEncryptionKey(a, b.pub.toHex())
+  var fromECPubKey = utils.sharedEncryptionKey(a, b.pub)
 
   t.ok(bufferEqual(ab, ba))
+  t.ok(bufferEqual(ab, fromWIF))
+  t.ok(bufferEqual(ab, fromECKey))
+  t.ok(bufferEqual(ab, fromECPubKey))
+
+  t.end()
 })
 
 // test('new ecdh vs old', function (t) {

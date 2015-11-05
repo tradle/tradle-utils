@@ -179,11 +179,14 @@ var utils = {
     if (typeof aPriv === 'string') aPriv = bitcoin.ECKey.fromWIF(aPriv)
     if (typeof bPub !== 'string') bPub = bPub.toHex()
 
+    var ad = typeof aPriv.toWIF === 'function' ? aPriv.d : aPriv
+
     // elliptic is 10x faster at ECDH
-    aPriv = ec.keyPair({ priv: new bn(aPriv.toString(16), 16) })
-    bPub = ec.keyFromPublic(bPub, 'hex')
-    var sharedSecret = aPriv.derive(bPub.getPublic())
-    return new Buffer(sharedSecret.toString('hex'), 'hex')
+    var ecA = ec.keyPair({ priv: new bn(ad.toString(16), 16) })
+    var ecB = ec.keyFromPublic(bPub, 'hex')
+    var sharedSecret = ecA.derive(ecB.getPublic())
+    var buf = new Buffer(sharedSecret.toString('hex'), 'hex')
+    return buf
   },
 
   // sharedSecretOld: function (aPriv, bPub) {
