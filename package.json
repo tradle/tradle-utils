@@ -8,7 +8,6 @@
     "style": "standard"
   },
   "pre-commit": [
-    "style",
     "test"
   ],
   "bugs": {
