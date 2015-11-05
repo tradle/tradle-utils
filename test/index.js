@@ -33,3 +33,18 @@ test('ecdh', function (t) {
 
   t.ok(bufferEqual(ab, ba))
 })
+
+// test('new ecdh vs old', function (t) {
+//   t.plan(1)
+
+//   var a = ECKey.makeRandom()
+//   var b = ECKey.makeRandom()
+
+//   // var ab = a.pub.Q.multiply(b.d).getEncoded()
+//   // var ba = b.pub.Q.multiply(a.d).getEncoded()
+
+//   var ab = utils.sharedSecret(a.d, b.pub)
+//   var ba = utils.sharedSecretOld(b.d, a.pub)
+
+//   t.ok(bufferEqual(ab, ba))
+// })

@@ -10,6 +10,8 @@ var defaults = require('defaults')
 var mkdirp = require('mkdirp')
 var stringify = require('json-stable-stringify')
 var bitcoin = require('bitcoinjs-lib')
+var ec = require('elliptic').ec('secp256k1')
+var bn = require('bn.js')
 var CTR = 'aes-256-ctr'
 var DHT_MSG_REGEX = /^d1:(.?d2:id20:|eli20)/
 
@@ -145,11 +147,11 @@ var utils = {
   },
 
   getAddressFromInput: function (input, networkName) {
-    if (bitcoin.scripts.classifyInput(input.script) === 'pubkeyhash') {
-      var network = bitcoin.networks[networkName]
-      return bitcoin.ECPubKey.fromBuffer(input.script.chunks[1])
-        .getAddress(network)
-        .toString()
+    var pub
+    try {
+      pub = bitcoin.ECPubKey.fromBuffer(input.script.chunks[1])
+      return pub.getAddress(networkName).toString()
+    } catch (err) {
     }
   },
 
@@ -175,16 +177,27 @@ var utils = {
 
   sharedSecret: function (aPriv, bPub) {
     if (typeof aPriv === 'string') aPriv = bitcoin.ECKey.fromWIF(aPriv)
-    if (typeof bPub === 'string') bPub = bitcoin.ECPubKey.fromHex(bPub)
+    if (typeof bPub !== 'string') bPub = bPub.toHex()
 
-    aPriv = aPriv.d || aPriv
-    var shared = bPub.Q.multiply(aPriv).getEncoded(true)
-    // cut off version byte 0x02/0x03
-    // https://github.com/cryptocoinjs/ecurve/blob/master/lib/point.js#L207
-    if (shared.length === 33) shared = shared.slice(1)
-
-    return shared
+    // elliptic is 10x faster at ECDH
+    aPriv = ec.keyPair({ priv: new bn(aPriv.toString(16), 16) })
+    bPub = ec.keyFromPublic(bPub, 'hex')
+    var sharedSecret = aPriv.derive(bPub.getPublic())
+    return new Buffer(sharedSecret.toString('hex'), 'hex')
   },
+
+  // sharedSecretOld: function (aPriv, bPub) {
+  //   if (typeof aPriv === 'string') aPriv = bitcoin.ECKey.fromWIF(aPriv)
+  //   if (typeof bPub === 'string') bPub = bitcoin.ECPubKey.fromHex(bPub)
+
+  //   aPriv = aPriv.d || aPriv
+  //   var shared = bPub.Q.multiply(aPriv).getEncoded(true)
+  //   // cut off version byte 0x02/0x03
+  //   // https://github.com/cryptocoinjs/ecurve/blob/master/lib/point.js#L207
+  //   if (shared.length === 33) shared = shared.slice(1)
+
+  //   return shared
+  // },
 
   sharedEncryptionKey: function (aPriv, bPub) {
     var sharedSecret = utils.sharedSecret(aPriv, bPub)
