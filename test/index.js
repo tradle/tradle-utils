@@ -1,7 +1,7 @@
 var crypto = require('crypto')
 var test = require('tape')
 var bufferEqual = require('buffer-equal')
-var ECKey = require('bitcoinjs-lib').ECKey
+var ECKey = require('@tradle/bitcoinjs-lib').ECKey
 var utils = require('../')
 
 test('aes encrypt/decrypt', function (t) {
