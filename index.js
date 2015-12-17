@@ -1,21 +1,25 @@
 'use strict'
 
 var assert = require('assert')
-var fs = require('fs')
-var path = require('path')
 var crypto = require('crypto')
 var createTorrent = require('create-torrent')
 var parseTorrent = require('parse-torrent')
 var defaults = require('defaults')
-var mkdirp = require('mkdirp')
 var stringify = require('json-stable-stringify')
 var bitcoin = require('@tradle/bitcoinjs-lib')
 var ec = require('elliptic').ec('secp256k1')
 var bn = require('bn.js')
-var CTR = 'aes-256-ctr'
+var typeforce = require('typeforce')
+
+var CIPHERTEXT_ENCODING = 'base64'
+var PLAINTEXT_ENCODING = 'utf8'
+var SYMMETRIC_ENCRYPTION_ALGO = 'aes-256-ctr'
 var DHT_MSG_REGEX = /^d1:(.?d2:id20:|eli20)/
+var cryptoUtils = require('./crypto')
 
 var utils = {
+  encryptAsync: cryptoUtils.encrypt,
+  decryptAsync: cryptoUtils.decrypt,
   createTorrent: function (data, options, callback) {
     if (typeof data === 'string') console.warn('Interpreting data as file path: ' + data)
 
@@ -78,34 +82,6 @@ var utils = {
   requireOptions: function (options /* [, option1, option2, ...] */) {
     [].slice.call(arguments, 1).map(function (arg) {
       utils.requireOption(options, arg)
-    })
-  },
-
-  writeFile: function (options, callback) {
-    var filePath = utils.requireOption(options, 'path')
-    filePath = path.resolve(filePath)
-    var data = utils.requireOption(options, 'data')
-    var fileOptions = options.options || {
-        encoding: 'utf8'
-      }
-    var tmpPath = options.safe ?
-      filePath + '.' + crypto.randomBytes(8).toString('hex') + '.tmp' :
-      filePath
-
-    mkdirp(path.dirname(filePath), function (err) {
-      if (err) return callback(err)
-
-      fs.writeFile(tmpPath, data, fileOptions, function (err) {
-        if (err) return callback(err)
-
-        if (!options.safe) return callback()
-
-        fs.rename(tmpPath, filePath, function (err) {
-          if (err) return callback(err)
-
-          callback()
-        })
-      })
     })
   },
 
@@ -210,14 +186,14 @@ var utils = {
   encrypt: function (text, password) {
     assert(text && password, 'text and password are both required')
 
-    var cipher = crypto.createCipher(CTR, password)
+    var cipher = crypto.createCipher(SYMMETRIC_ENCRYPTION_ALGO, password)
     return updateCipher(cipher, text)
   },
 
   decrypt: function (text, password) {
     assert(text && password, 'text and password are both required')
 
-    var decipher = crypto.createDecipher(CTR, password)
+    var decipher = crypto.createDecipher(SYMMETRIC_ENCRYPTION_ALGO, password)
     return updateDecipher(decipher, text)
   },
 

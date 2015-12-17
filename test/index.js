@@ -4,7 +4,7 @@ var bufferEqual = require('buffer-equal')
 var ECKey = require('@tradle/bitcoinjs-lib').ECKey
 var utils = require('../')
 
-test('aes encrypt/decrypt', function (t) {
+test('aes encrypt/decrypt with password', function (t) {
   t.plan(2)
 
   var buf = crypto.randomBytes(32)
@@ -17,6 +17,28 @@ test('aes encrypt/decrypt', function (t) {
 
   buf = crypto.randomBytes(128)
 // t.ok(bufferEqual(buf, utils.fileToBuf(utils.fileToString(buf))))
+})
+
+test('aes encrypt/decrypt with key', function (t) {
+  t.plan(1)
+
+  var plaintext = crypto.randomBytes(32)
+  var key = crypto.randomBytes(32)
+  utils.encryptAsync({
+    data: plaintext,
+    key: key
+  }, function (err, ciphertext) {
+    if (err) throw err
+
+    utils.decryptAsync({
+      data: ciphertext,
+      key: key
+    }, function (err, decrypted) {
+      if (err) throw err
+
+      t.ok(bufferEqual(decrypted, plaintext))
+    })
+  })
 })
 
 test('ecdh', function (t) {
