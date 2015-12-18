@@ -22,11 +22,12 @@ test('aes encrypt/decrypt with password', function (t) {
 test('aes encrypt/decrypt with key', function (t) {
   t.plan(1)
 
-  var plaintext = crypto.randomBytes(32)
+  var plaintext = crypto.randomBytes(1000)
   var key = crypto.randomBytes(32)
   utils.encryptAsync({
     data: plaintext,
-    key: key
+    key: key,
+    pieceSize: 32
   }, function (err, ciphertext) {
     if (err) throw err
 

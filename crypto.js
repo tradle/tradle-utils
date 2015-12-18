@@ -82,7 +82,7 @@ function runCipherOp (createCipherMethod, opts, cb) {
   function iterate () {
     var bytes
     if (input.length - offset <= pieceSize) {
-      bytes = input
+      bytes = input.slice(offset)
       isLastOne = true
     } else {
       bytes = input.slice(offset, offset + pieceSize)
