@@ -33,7 +33,8 @@ test('aes encrypt/decrypt with key', function (t) {
 
     utils.decryptAsync({
       data: ciphertext,
-      key: key
+      key: key,
+      pieceSize: 20
     }, function (err, decrypted) {
       if (err) throw err
 

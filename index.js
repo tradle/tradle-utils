@@ -10,16 +10,46 @@ var bitcoin = require('@tradle/bitcoinjs-lib')
 var ec = require('elliptic').ec('secp256k1')
 var bn = require('bn.js')
 var typeforce = require('typeforce')
+var extend = require('xtend')
 
 var CIPHERTEXT_ENCODING = 'base64'
 var PLAINTEXT_ENCODING = 'utf8'
 var SYMMETRIC_ENCRYPTION_ALGO = 'aes-256-ctr'
 var DHT_MSG_REGEX = /^d1:(.?d2:id20:|eli20)/
-var cryptoUtils = require('./crypto')
 
+var IV_SIZE = 16
+var KEY_SIZE = 32
 var utils = {
-  encryptAsync: cryptoUtils.encrypt,
-  decryptAsync: cryptoUtils.decrypt,
+  ENCRYPTION_PIECE_SIZE: 10240, // 10KB
+  /*
+   * @return Buffer (format: iv|ciphertext)
+   */
+  encryptAsync: function (opts, cb) {
+    if (opts.iv) {
+      if (opts.iv.length !== IV_SIZE) {
+        return cb(new Error('invalid IV size'))
+      }
+
+      return run()
+    }
+
+    opts = extend(opts)
+    crypto.randomBytes(IV_SIZE, function (err, iv) {
+      if (err) return cb(err)
+
+      opts.iv = iv
+      run()
+    })
+
+    function run () {
+      runCipherOp('createCipheriv', opts, cb)
+    }
+  },
+  /*
+   * input data should be of the format returned
+   * by the above encrypt method
+   */
+  decryptAsync: runCipherOp.bind(null, 'createDecipheriv'),
   createTorrent: function (data, options, callback) {
     if (typeof data === 'string') console.warn('Interpreting data as file path: ' + data)
 
@@ -216,6 +246,64 @@ function updateCipher (cipher, data) {
 function updateDecipher (decipher, data) {
   if (Buffer.isBuffer(data)) return Buffer.concat([decipher.update(data), decipher.final()])
   else return decipher.update(data, 'base64', 'utf8') + decipher.final('utf8')
+}
+
+function runCipherOp (createCipherMethod, opts, cb) {
+  typeforce('String', createCipherMethod)
+  typeforce({
+    data: 'Buffer',
+    key: 'Buffer',
+    pieceSize: '?Number',
+    iv: '?Buffer'
+  }, opts)
+
+  if (opts.key.length !== KEY_SIZE) {
+    return cb(new Error('invalid key size'))
+  }
+
+  var input = opts.data
+  var iv = opts.iv
+  var bufs = []
+  if (createCipherMethod === 'createDecipheriv') {
+    if (iv) return cb(new Error('expected "iv" as part of "data"'))
+
+    iv = input.slice(0, IV_SIZE)
+    input = input.slice(IV_SIZE)
+  } else {
+    bufs.push(iv)
+  }
+
+  var cipher = crypto[createCipherMethod](SYMMETRIC_ENCRYPTION_ALGO, opts.key, iv)
+  var pieceSize = opts.pieceSize || utils.ENCRYPTION_PIECE_SIZE
+  pieceSize = Math.min(pieceSize, input.length)
+
+  var offset = 0
+  var isLastOne
+
+  iterate()
+
+  /**
+   * if pieceSize is indicated, will yield (setTimeout)
+   * between encryptions of pieceSize sized pieces
+   *
+   * @return {[type]} [description]
+   */
+  function iterate () {
+    var bytes
+    if (input.length - offset <= pieceSize) {
+      bytes = input.slice(offset)
+      isLastOne = true
+    } else {
+      bytes = input.slice(offset, offset + pieceSize)
+      offset += pieceSize
+    }
+
+    bufs.push(cipher.update(bytes))
+    if (!isLastOne) return setTimeout(iterate, 0)
+
+    bufs.push(cipher.final())
+    cb(null, Buffer.concat(bufs))
+  }
 }
 
 module.exports = utils
