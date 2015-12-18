@@ -1,6 +1,6 @@
 {
   "name": "@tradle/utils",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "common utility functions for tradle components",
   "main": "index.js",
   "scripts": {
