@@ -239,13 +239,21 @@ var utils = {
 }
 
 function updateCipher (cipher, data) {
-  if (Buffer.isBuffer(data)) return Buffer.concat([cipher.update(data), cipher.final()])
-  else return cipher.update(data, 'utf8', 'base64') + cipher.final('base64')
+  if (Buffer.isBuffer(data)) {
+    return Buffer.concat([cipher.update(data), cipher.final()])
+  } else {
+    return cipher.update(data, PLAINTEXT_ENCODING, CIPHERTEXT_ENCODING) +
+      cipher.final(CIPHERTEXT_ENCODING)
+  }
 }
 
 function updateDecipher (decipher, data) {
-  if (Buffer.isBuffer(data)) return Buffer.concat([decipher.update(data), decipher.final()])
-  else return decipher.update(data, 'base64', 'utf8') + decipher.final('utf8')
+  if (Buffer.isBuffer(data)) {
+    return Buffer.concat([decipher.update(data), decipher.final()])
+  } else {
+    return decipher.update(data, CIPHERTEXT_ENCODING, PLAINTEXT_ENCODING) +
+      decipher.final(PLAINTEXT_ENCODING)
+  }
 }
 
 function runCipherOp (createCipherMethod, opts, cb) {
