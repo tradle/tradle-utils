@@ -4,7 +4,7 @@
   "description": "common utility functions for tradle components",
   "main": "index.js",
   "scripts": {
-    "test": "node test/*.js",
+    "test": "node test",
     "style": "standard"
   },
   "pre-commit": [
