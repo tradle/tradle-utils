@@ -191,8 +191,9 @@ var utils = {
     var ecA = ec.keyPair({ priv: new bn(ad.toString(16), 16) })
     var ecB = ec.keyFromPublic(bPub, 'hex')
     var sharedSecret = ecA.derive(ecB.getPublic())
-    var buf = new Buffer(sharedSecret.toString('hex', 2), 'hex')
-    return buf
+    // pad to an even number of bytes
+    // https://github.com/indutny/bn.js/issues/22
+    return new Buffer(sharedSecret.toString('hex', 2), 'hex')
   },
 
   // sharedSecretOld: function (aPriv, bPub) {
