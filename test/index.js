@@ -2,6 +2,8 @@ var crypto = require('crypto')
 var test = require('tape')
 var bufferEqual = require('buffer-equal')
 var ECKey = require('@tradle/bitcoinjs-lib').ECKey
+var nativeECDH = require('../ecdh')
+var browserECDH = require('../ecdh-browser')
 var utils = require('../')
 
 test('aes encrypt/decrypt with password', function (t) {
@@ -47,20 +49,21 @@ test('ecdh', function (t) {
   var a = ECKey.makeRandom()
   var b = ECKey.makeRandom()
 
-  // var ab = a.pub.Q.multiply(b.d).getEncoded()
-  // var ba = b.pub.Q.multiply(a.d).getEncoded()
-
   // pass in strings
-  var ab = utils.sharedEncryptionKey(a.d, b.pub.toHex())
-  var ba = utils.sharedEncryptionKey(b.d, a.pub.toHex())
-  var fromWIF = utils.sharedEncryptionKey(a.toWIF(), b.pub.toHex())
-  var fromECKey = utils.sharedEncryptionKey(a, b.pub.toHex())
-  var fromECPubKey = utils.sharedEncryptionKey(a, b.pub)
+  var sharedSecret = utils.sharedEncryptionKey(a.d, b.pub.toHex())
 
-  t.ok(bufferEqual(ab, ba))
-  t.ok(bufferEqual(ab, fromWIF))
-  t.ok(bufferEqual(ab, fromECKey))
-  t.ok(bufferEqual(ab, fromECPubKey))
+  ;[nativeECDH, browserECDH].forEach(function (impl) {
+    utils.ecdh = impl
+    var ab = utils.sharedEncryptionKey(a.d, b.pub.toHex())
+    var ba = utils.sharedEncryptionKey(b.d, a.pub.toHex())
+    var fromWIF = utils.sharedEncryptionKey(a.toWIF(), b.pub.toHex())
+    var fromECKey = utils.sharedEncryptionKey(a, b.pub.toHex())
+    var fromECPubKey = utils.sharedEncryptionKey(a, b.pub)
+
+    ;[ab, ba, fromWIF, fromECKey, fromECPubKey].forEach(function (val) {
+      t.deepEqual(val, sharedSecret)
+    })
+  })
 
   t.end()
 })

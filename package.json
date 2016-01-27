@@ -36,5 +36,11 @@
     "jshint": "latest",
     "pre-commit": "^1.0.10",
     "tape": "^4.0.0"
+  },
+  "browser": {
+    "./ecdh.js": "./ecdh-browser.js"
+  },
+  "react-native": {
+    "./ecdh.js": "./ecdh-browser.js"
   }
 }

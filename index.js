@@ -6,11 +6,10 @@ var createTorrent = require('create-torrent')
 var parseTorrent = require('parse-torrent')
 var defaults = require('defaults')
 var stringify = require('json-stable-stringify')
-var bitcoin = require('@tradle/bitcoinjs-lib')
-var ec = require('elliptic').ec('secp256k1')
-var bn = require('bn.js')
 var typeforce = require('typeforce')
 var extend = require('xtend')
+var bitcoin = require('@tradle/bitcoinjs-lib')
+var ecdh = require('./ecdh')
 
 var CIPHERTEXT_ENCODING = 'base64'
 var PLAINTEXT_ENCODING = 'utf8'
@@ -181,19 +180,14 @@ var utils = {
     }
   },
 
+  ecdh: ecdh,
+
   sharedSecret: function (aPriv, bPub) {
     if (typeof aPriv === 'string') aPriv = bitcoin.ECKey.fromWIF(aPriv)
     if (typeof bPub !== 'string') bPub = bPub.toHex()
 
     var ad = typeof aPriv.toWIF === 'function' ? aPriv.d : aPriv
-
-    // elliptic is 10x faster at ECDH
-    var ecA = ec.keyPair({ priv: new bn(ad.toString(16), 16) })
-    var ecB = ec.keyFromPublic(bPub, 'hex')
-    var sharedSecret = ecA.derive(ecB.getPublic())
-    // pad to an even number of bytes
-    // https://github.com/indutny/bn.js/issues/22
-    return new Buffer(sharedSecret.toString('hex', 2), 'hex')
+    return utils.ecdh(padToEven(ad.toString(16)), bPub)
   },
 
   // sharedSecretOld: function (aPriv, bPub) {
@@ -313,6 +307,11 @@ function runCipherOp (createCipherMethod, opts, cb) {
     bufs.push(cipher.final())
     cb(null, Buffer.concat(bufs))
   }
+}
+
+function padToEven (hex) {
+  // pad to an even number of bytes
+  return hex.length % 2 === 0 ? hex : '0' + hex
 }
 
 module.exports = utils
