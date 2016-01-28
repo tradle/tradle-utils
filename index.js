@@ -182,13 +182,13 @@ var utils = {
 
   ecdh: ecdh,
 
-  sharedSecret: function (aPriv, bPub) {
-    if (typeof aPriv === 'string') aPriv = bitcoin.ECKey.fromWIF(aPriv)
-    if (typeof bPub !== 'string') bPub = bPub.toHex()
+  // sharedSecret: function (aPriv, bPub) {
+  //   if (typeof aPriv === 'string') aPriv = bitcoin.ECKey.fromWIF(aPriv)
+  //   if (typeof bPub !== 'string') bPub = bPub.toHex()
 
-    var ad = typeof aPriv.toWIF === 'function' ? aPriv.d : aPriv
-    return utils.ecdh(padToEven(ad.toString(16)), bPub)
-  },
+  //   var ad = typeof aPriv.toWIF === 'function' ? aPriv.d : aPriv
+  //   return utils.ecdh(padToEven(ad.toString(16)), bPub)
+  // },
 
   // sharedSecretOld: function (aPriv, bPub) {
   //   if (typeof aPriv === 'string') aPriv = bitcoin.ECKey.fromWIF(aPriv)
@@ -203,10 +203,7 @@ var utils = {
   //   return shared
   // },
 
-  sharedEncryptionKey: function (aPriv, bPub) {
-    var sharedSecret = utils.sharedSecret(aPriv, bPub)
-    return crypto.createHash('sha256').update(sharedSecret).digest()
-  },
+  sharedEncryptionKey: ecdh,
 
   encrypt: function (text, password) {
     assert(text && password, 'text and password are both required')
@@ -230,6 +227,10 @@ var utils = {
     crypto.randomBytes(32, function (err, bytes) {
       cb(err, bytes && bytes.toString('base64'))
     })
+  },
+
+  destroy: function () {
+    if (ecdh.close) ecdh.close()
   }
 }
 

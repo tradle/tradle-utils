@@ -5,6 +5,7 @@ var ECKey = require('@tradle/bitcoinjs-lib').ECKey
 var nativeECDH = require('../ecdh')
 var browserECDH = require('../ecdh-browser')
 var utils = require('../')
+require('./ecdh-async')
 
 test('aes encrypt/decrypt with password', function (t) {
   t.plan(2)
