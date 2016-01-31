@@ -11,7 +11,7 @@ module.exports = function (aPriv, bPub) {
     aPriv = ecdhUtils.ecKeyToString(aPriv)
   }
 
-  var ecA = ec.keyPair({ priv: new bn(aPriv, 16) })
+  var ecA = ec.keyPair({ priv: aPriv, privEnc: 'hex' })
   var ecB = ec.keyFromPublic(bPub, 'hex')
   var sharedSecret = ecA.derive(ecB.getPublic())
   // pad to an even number of bytes
