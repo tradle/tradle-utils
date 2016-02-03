@@ -314,8 +314,9 @@ function runCipherOp (createCipherMethod, opts, cb) {
     bufs.push(cipher.update(bytes))
     if (!isLastOne) return setTimeout(iterate, 0)
 
-    bufs.push(cipher.final())
-    cb(null, Buffer.concat(bufs))
+    var fin = cipher.final()
+    if (fin.length) bufs.push(fin)
+    cb(null, bufs.length === 1 ? bufs[0] : Buffer.concat(bufs))
   }
 }
 
