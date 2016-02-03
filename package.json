@@ -30,9 +30,11 @@
     "json-stable-stringify": "^1.0.0",
     "parse-torrent": "^3.0.0",
     "typeforce": "^1.6.1",
+    "webworker-threads": "^0.6.2",
     "xtend": "^4.0.1"
   },
   "devDependencies": {
+    "bluebird-q": "^1.0.3",
     "buffer-equal": "0.0.1",
     "jshint": "latest",
     "pre-commit": "^1.0.10",

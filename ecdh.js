@@ -8,7 +8,8 @@ const syncECDH = require('./sync-ecdh')
 const ecdhUtils = require('./ecdh-utils')
 const WORKERS_ENABLED = process.env.WORKERS_ENABLED
 const cc = WORKERS_ENABLED && new computecluster({
-  module: path.resolve(__dirname, './worker.js')
+  module: path.resolve(__dirname, './worker.js'),
+  max_backlog: Infinity
 })
 
 module.exports = performECDH
