@@ -41,9 +41,9 @@
     "tape": "^4.0.0"
   },
   "browser": {
-    "./ecdh.js": "./ecdh-browser.js"
+    "./sync-ecdh.js": "./sync-ecdh-browser.js"
   },
   "react-native": {
-    "./ecdh.js": "./ecdh-browser.js"
+    "./sync-ecdh.js": "./sync-ecdh-browser.js"
   }
 }

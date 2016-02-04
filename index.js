@@ -182,27 +182,6 @@ var utils = {
 
   ecdh: ecdh,
 
-  // sharedSecret: function (aPriv, bPub) {
-  //   if (typeof aPriv === 'string') aPriv = bitcoin.ECKey.fromWIF(aPriv)
-  //   if (typeof bPub !== 'string') bPub = bPub.toHex()
-
-  //   var ad = typeof aPriv.toWIF === 'function' ? aPriv.d : aPriv
-  //   return utils.ecdh(padToEven(ad.toString(16)), bPub)
-  // },
-
-  // sharedSecretOld: function (aPriv, bPub) {
-  //   if (typeof aPriv === 'string') aPriv = bitcoin.ECKey.fromWIF(aPriv)
-  //   if (typeof bPub === 'string') bPub = bitcoin.ECPubKey.fromHex(bPub)
-
-  //   aPriv = aPriv.d || aPriv
-  //   var shared = bPub.Q.multiply(aPriv).getEncoded(true)
-  //   // cut off version byte 0x02/0x03
-  //   // https://github.com/cryptocoinjs/ecurve/blob/master/lib/point.js#L207
-  //   if (shared.length === 33) shared = shared.slice(1)
-
-  //   return shared
-  // },
-
   sharedEncryptionKey: ecdh,
 
   encrypt: function (text, password) {
@@ -318,11 +297,6 @@ function runCipherOp (createCipherMethod, opts, cb) {
     if (fin.length) bufs.push(fin)
     cb(null, bufs.length === 1 ? bufs[0] : Buffer.concat(bufs))
   }
-}
-
-function padToEven (hex) {
-  // pad to an even number of bytes
-  return hex.length % 2 === 0 ? hex : '0' + hex
 }
 
 module.exports = utils

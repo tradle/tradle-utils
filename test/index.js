@@ -2,8 +2,9 @@ var crypto = require('crypto')
 var test = require('tape')
 var bufferEqual = require('buffer-equal')
 var ECKey = require('@tradle/bitcoinjs-lib').ECKey
-var nativeECDH = require('../ecdh')
-var browserECDH = require('../ecdh-browser')
+var nativeECDH = require('../sync-ecdh')
+var browserECDH = require('../sync-ecdh-browser')
+var ecdhUtils = require('../ecdh-utils')
 var utils = require('../')
 require('./ecdh-async')
 
@@ -47,22 +48,38 @@ test('aes encrypt/decrypt with key', function (t) {
 })
 
 test('ecdh', function (t) {
-  var a = ECKey.makeRandom()
-  var b = ECKey.makeRandom()
+  var pairs = [
+    {
+      // the last set of keys to break it (due to padding)
+      a: ECKey.fromWIF('L2tAq9ZtTTcnVUbgQxBMLn2AWMtK2DsAbEMfxYmZYa1XZkKtB64t'),
+      b: ECKey.fromWIF('KxrTQoS8FUW9AXPc7emRoAyS3VmRyPKmt6y8spUtoYvsqgwQcSBd')
+    },
+    {
+      a: ECKey.makeRandom(),
+      b: ECKey.makeRandom()
+    }
+  ]
 
   // pass in strings
-  var sharedSecret = utils.sharedEncryptionKey(a.d, b.pub.toHex())
 
-  ;[nativeECDH, browserECDH].forEach(function (impl) {
-    utils.ecdh = impl
-    var ab = utils.sharedEncryptionKey(a.d, b.pub.toHex())
-    var ba = utils.sharedEncryptionKey(b.d, a.pub.toHex())
-    var fromWIF = utils.sharedEncryptionKey(a.toWIF(), b.pub.toHex())
-    var fromECKey = utils.sharedEncryptionKey(a, b.pub.toHex())
-    var fromECPubKey = utils.sharedEncryptionKey(a, b.pub)
+  pairs.forEach(function (pair) {
+    var a = pair.a
+    var b = pair.b
+    var sharedSecret = utils.sharedEncryptionKey(a.d, b.pub.toHex())
+    ;[nativeECDH, browserECDH].forEach(function (impl) {
+      ecdhUtils.syncECDH = impl
+      var ab = utils.sharedEncryptionKey(a.d, b.pub.toHex())
+      var ba = utils.sharedEncryptionKey(b.d, a.pub.toHex())
+      var fromWIF = utils.sharedEncryptionKey(a.toWIF(), b.pub.toHex())
+      var fromECKey = utils.sharedEncryptionKey(a, b.pub.toHex())
+      var fromECPubKey = utils.sharedEncryptionKey(a, b.pub)
 
-    ;[ab, ba, fromWIF, fromECKey, fromECPubKey].forEach(function (val) {
-      t.deepEqual(val, sharedSecret)
+      ;[ab, ba, fromWIF, fromECKey, fromECPubKey].forEach(function (val) {
+        if (val.toString('hex') !== sharedSecret.toString('hex')) {
+          // print so we know what keys broke it
+          t.fail('ECDH native vs browser did not match on keys: ' + a.toWIF() + ', ' + b.toWIF())
+        }
+      })
     })
   })
 

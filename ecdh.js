@@ -4,7 +4,6 @@ const bitcoin = require('@tradle/bitcoinjs-lib')
 const crypto = require('crypto')
 const computecluster = require('compute-cluster')
 const extend = require('xtend')
-const syncECDH = require('./sync-ecdh')
 const ecdhUtils = require('./ecdh-utils')
 const WORKERS_ENABLED = process.env.WORKERS_ENABLED
 const cc = WORKERS_ENABLED && new computecluster({
@@ -23,7 +22,7 @@ function performECDH (aPriv, bPub, cb) {
       aPriv = ecdhUtils.ecKeyToString(aPriv)
     }
 
-    return ecdhUtils.syncECDH(aPriv, bPub)
+    return ecdhUtils.sharedEncryptionKey(aPriv, bPub)
   }
 
   if (!WORKERS_ENABLED) {

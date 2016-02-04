@@ -36,7 +36,7 @@ function ecdh (data) {
     data.priv = ecdhUtils.ecKeyStringFromWIF(data.wif)
   }
 
-  return ecdhUtils.syncECDH(data.priv, data.pub).toString('hex')
+  return ecdhUtils.sharedEncryptionKey(data.priv, data.pub).toString('hex')
 }
 
 function decompress (pubHex) {
