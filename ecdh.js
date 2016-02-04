@@ -1,9 +1,13 @@
 const path = require('path')
 const crypto = require('crypto')
-const cluster
-const computecluster
-const cc
-const WORKERS_ENABLED
+const bitcoin = require('@tradle/bitcoinjs-lib')
+const extend = require('xtend')
+const ecdhUtils = require('./ecdh-utils')
+
+var cluster
+var computecluster
+var cc
+var WORKERS_ENABLED
 try {
   cluster = require('cluster')
   computecluster = require('compute-cluster')
@@ -15,10 +19,6 @@ try {
   // only if cluster is available
   WORKERS_ENABLED = process.env.WORKERS_ENABLED
 } catch (err) {}
-
-const bitcoin = require('@tradle/bitcoinjs-lib')
-const extend = require('xtend')
-const ecdhUtils = require('./ecdh-utils')
 
 module.exports = performECDH
 
