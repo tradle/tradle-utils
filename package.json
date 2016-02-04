@@ -41,9 +41,13 @@
     "tape": "^4.0.0"
   },
   "browser": {
-    "./sync-ecdh.js": "./sync-ecdh-browser.js"
+    "./sync-ecdh.js": "./sync-ecdh-browser.js",
+    "cluster": false,
+    "compute-cluster": false
   },
   "react-native": {
-    "./sync-ecdh.js": "./sync-ecdh-browser.js"
+    "./sync-ecdh.js": "./sync-ecdh-browser.js",
+    "cluster": false,
+    "compute-cluster": false
   }
 }
