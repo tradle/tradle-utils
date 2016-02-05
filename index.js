@@ -203,6 +203,8 @@ var utils = {
   },
 
   newMsgNonce: function (cb) {
+    if (!cb) return crypto.randomBytes(32).toString('base64')
+
     crypto.randomBytes(32, function (err, bytes) {
       cb(err, bytes && bytes.toString('base64'))
     })
