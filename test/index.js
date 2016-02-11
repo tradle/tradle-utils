@@ -86,6 +86,21 @@ test('ecdh', function (t) {
   t.end()
 })
 
+test('rebuf', function (t) {
+  var orig = {
+    blah: new Buffer('blah'),
+    habla: {
+      blah: new Buffer('blah1')
+    }
+  }
+
+  var recovered = JSON.parse(JSON.stringify(orig))
+  var rebufed = utils.rebuf(recovered)
+  t.ok(Buffer.isBuffer(rebufed.blah))
+  t.ok(Buffer.isBuffer(rebufed.habla.blah))
+  t.end()
+})
+
 // test('new ecdh vs old', function (t) {
 //   t.plan(1)
 
