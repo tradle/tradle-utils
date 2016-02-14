@@ -1,3 +1,8 @@
 node_modules
 npm-debug.log
 .js*
+ecdh-master.js
+ecdh-worker.js
+ecdh-thread.js
+threads.js
+vendor/
